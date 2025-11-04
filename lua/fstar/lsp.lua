@@ -1,6 +1,6 @@
 local lsp = { handlers = {} }
 
-local bundled_server_url = 'https://github.com/FStarLang/fstar-vscode-assistant/releases/download/v0.12.0/fstar-language-server-0.12.0.js'
+local bundled_server_url = 'https://github.com/FStarLang/fstar-vscode-assistant/releases/download/v0.22.0/fstar-language-server-0.22.0.js'
 
 local bundled_server_path =
   vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2)))) .. '/' .. vim.fs.basename(bundled_server_url)
@@ -51,13 +51,7 @@ end
 --- given bufnr.
 ---@param bufnr? number
 function lsp.get_fstar_server(bufnr)
-  local fstar_client
-  vim.lsp.for_each_buffer_client(bufnr, function(client)
-    if client.name == 'fstar' then
-      fstar_client = client
-    end
-  end)
-  return fstar_client
+  return vim.lsp.get_clients({bufnr = bufnr, name = 'fstar'})[1]
 end
 
 function lsp.handlers.status_handler(err, params)
