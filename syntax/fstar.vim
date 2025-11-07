@@ -157,6 +157,7 @@ syn keyword  fstarKeyword  parser pattern private raise rec requires
 syn keyword  fstarKeyword  try type
 syn keyword  fstarKeyword  virtual when while with
 syn keyword  fstarKeyword  class instance
+syn keyword  fstarKeyword  unfold
 
 syn keyword  fstarBoolean  True False
 syn keyword  fstarKeyword  function
