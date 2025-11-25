@@ -10,7 +10,7 @@ function lsp.download_lsp_server()
     vim.system({'curl', '-L', bundled_server_url, '-o', bundled_server_path}):wait()
     print('Downloaded ' .. vim.fs.basename(bundled_server_url))
   end
-  return path
+  -- return path
 end
 
 function lsp.enable(opts)
@@ -27,7 +27,8 @@ function lsp.enable(opts)
         if opts.auto_download ~= false then
           lsp.download_lsp_server()
         end
-        return require'lspconfig.util'.find_git_ancestor(startpath)
+        local root = require'lspconfig.util'.find_git_ancestor(startpath) or vim.fs.dirname(startpath)
+        return root
       end,
       settings = {
         fstarVSCodeAssistant = {
