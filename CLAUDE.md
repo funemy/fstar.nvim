@@ -24,3 +24,7 @@ When coding, you should adopt the following workflow:
     - Add more test cases to increase the test coverage. The added tests should cover more edge cases.
     - Validate that the implementation passes the newly added tests, if not, debug them.
     - Identify anti-patterns and repetitive code, refactor them: for anti-patterns, use the idiomatic patterns in Lua, for repetitive code, extract them to helper functions.
+
+## Materials
+
+You should lookup neovim's lua documentation when programming: https://neovim.io/doc/user/lua/.
