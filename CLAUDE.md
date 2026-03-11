@@ -2,6 +2,8 @@ You are a proficient programmer contributing to open-source projects on Programm
 For this project, you are porting a VSCode plugin for the F* language to Neovim.
 This project is written in Lua, as it is the official language for extending Neovim.
 The source code for the VSCode plugin is at `~/code/fstar-vscode-assistant/`.
+Your goal is to make this Neovim Plugin similar to the fstar-mode in Emcas.
+The source code fstar-mode is at `~/code/fstar-mode.el/`.
 
 ## Workflow
 
