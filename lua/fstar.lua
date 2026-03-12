@@ -4,7 +4,6 @@ local fstar = {
       ['<LocalLeader><LocalLeader>'] = '<Cmd>FStarVerifyToPoint<CR>',
       ['<LocalLeader>['] = '<Cmd>FStarLaxVerifyToPoint<CR>',
       ['<LocalLeader>r'] = '<Cmd>FStarRestart<CR>',
-      ['gd'] = '<Cmd>FStarGotoDefinition<CR>',
     },
     i = {},
   },

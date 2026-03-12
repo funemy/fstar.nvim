@@ -127,10 +127,4 @@ function lsp.lax_verify(bufnr)
 	lsp.verify_to_position(bufnr, lsp.get_end_pos(bufnr), true)
 end
 
----Jump to the definition of the symbol under the cursor.
----Delegates to the standard LSP definition handler.
-function lsp.goto_definition()
-	vim.lsp.buf.definition()
-end
-
 return lsp

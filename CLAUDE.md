@@ -30,3 +30,7 @@ When coding, you should adopt the following workflow:
 ## Materials
 
 You should lookup neovim's lua documentation when programming: https://neovim.io/doc/user/lua/.
+
+## Coding Convention
+
+Whenever you finish editing a `.lua` file, you should format it using `stylua`.
