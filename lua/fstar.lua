@@ -35,7 +35,6 @@ function fstar.setup(opts)
     command! FStarLaxVerifyToPoint :lua require'fstar.lsp'.lax_verify_to_pos()
     command! FStarVerifyWholeFile :lua require'fstar.lsp'.verify()
     command! FStarLaxVerifyWholeFile :lua require'fstar.lsp'.lax_verify()
-    command! FStarGotoDefinition :lua require'fstar.lsp'.goto_definition()
   ]]
 
   if opts.mappings ~= false then
