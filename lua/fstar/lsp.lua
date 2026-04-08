@@ -73,6 +73,12 @@ function lsp.restart(bufnr)
 	client.notify("$/fstar/restart", { uri = uri })
 end
 
+function lsp.killAll(bufnr)
+	bufnr = bufnr or 0
+	local client = lsp.get_fstar_server(bufnr)
+	client.notify("$/fstar/killAll", {})
+end
+
 ---Restart the Z3 process for an open F* file.
 ---@param bufnr? number
 function lsp.restart_solver(bufnr)

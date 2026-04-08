@@ -1,9 +1,11 @@
 local fstar = {
   mappings = {
     n = {
-      ['<LocalLeader><LocalLeader>'] = '<Cmd>FStarVerifyToPoint<CR>',
+      ['<LocalLeader>l'] = '<Cmd>FStarVerifyToPoint<CR>',
       ['<LocalLeader>['] = '<Cmd>FStarLaxVerifyToPoint<CR>',
       ['<LocalLeader>r'] = '<Cmd>FStarRestart<CR>',
+      ['<LocalLeader>k'] = '<Cmd>FStarKillAll<CR>',
+      ['<LocalLeader>s'] = '<Cmd>FStarRestartSolver<CR>',
     },
     i = {},
   },
@@ -31,6 +33,8 @@ function fstar.setup(opts)
 
   vim.cmd [[
     command! FStarRestart :lua require'fstar.lsp'.restart()
+    command! FStarRestartSolver :lua require'fstar.lsp'.restart_solver()
+    command! FStarKillAll :lua require'fstar.lsp'.killAll()
     command! FStarVerifyToPoint :lua require'fstar.lsp'.verify_to_pos()
     command! FStarLaxVerifyToPoint :lua require'fstar.lsp'.lax_verify_to_pos()
     command! FStarVerifyWholeFile :lua require'fstar.lsp'.verify()
