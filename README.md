@@ -20,7 +20,7 @@ If you're using [vim-plug], for example, perform the following steps to install 
 	call plug#begin()
 	" ...
 	Plug 'neovim/nvim-lspconfig'
-	Plug 'gebner/VimFStar'
+	Plug 'funemy/fstar.nvim'
 	" ...
 	call plug#end()
 	```
@@ -35,7 +35,7 @@ If you're using [vim-plug], for example, perform the following steps to install 
 
 Make sure that `fstar.exe` and `z3` are in your path.  The first time you open an F* file, VimFStar will download the LSP server.  It will make use of the same `.fst.config.json` files as the official VS Code extension.
 
-To test your code and it to the environment up to the current position of the cursor, call `:FStarVerifyToPoint` (default binding: `<LocalLeader><LocalLeader>`).
+To test your code and it to the environment up to the current position of the cursor, call `:FStarVerifyToPoint` (default binding: `<LocalLeader>l`).
 
 You can restart F* with `:FStarRestart` (default binding: `<LocalLeader>r`)
 
