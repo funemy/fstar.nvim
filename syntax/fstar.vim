@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     F* (including the Pulse DSL)
 " Filenames:    *.fst *.fsti
-" Maintainers:  Michael Lowell Roberts <mirobert at microsoft dot com>
+" Maintainers:  Yanze Li <yanzeli at cs dot ubc dot ca> with help from Claude
 " URL:          https://fstar-lang.org
 "
 " Originally based on the ocaml.vim syntax file distributed with Vim.
