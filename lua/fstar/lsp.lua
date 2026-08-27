@@ -1,7 +1,7 @@
 local lsp = { handlers = {} }
 
 local bundled_server_url =
-	"https://github.com/FStarLang/fstar-vscode-assistant/releases/download/v0.24.0/fstar-language-server-0.24.0.js"
+  "https://github.com/FStarLang/fstar-vscode-assistant/releases/download/v0.25.4/fstar-language-server-0.25.4.js"
 
 local bundled_server_path = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(debug.getinfo(1, "S").source:sub(2))))
 	.. "/"
