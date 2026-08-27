@@ -1,328 +1,253 @@
 " Vim syntax file
-" Language:     F*
-" Filenames:    *.fst
+" Language:     F* (including the Pulse DSL)
+" Filenames:    *.fst *.fsti
 " Maintainers:  Michael Lowell Roberts <mirobert at microsoft dot com>
-" URL:          http://research.microsoft.com/en-us/projects/fstar/
+" URL:          https://fstar-lang.org
 "
-" Based on the ocaml.vim syntax file distributed with Vim.
+" Originally based on the ocaml.vim syntax file distributed with Vim.
+" Keyword lists follow the F* lexer (FStarC.Parser.LexFStar) and the Pulse
+" parser (PulseSyntaxExtension.Parser); highlighting categories follow the
+" F* VS Code extension's fstar.tmLanguage.json.
+"
 " Distributed under the VIM LICENSE. Please refer to the LICENSE file or
 " visit <http://vimdoc.sourceforge.net/htmldoc/uganda.html> for details.
 
-if version < 600
-  syntax clear
-elseif exists("b:current_syntax") && b:current_syntax == "fstar"
+if exists("b:current_syntax")
   finish
 endif
 
-" OCaml is case sensitive.
+" F* is case sensitive.
 syn case match
 
-" Access to the method of an object
-syn match    fstarMethod       "#"
-
-" Script headers highlighted like comments
-syn match    fstarComment   "^#!.*" contains=@Spell
-
-" Scripting directives
-syn match    fstarScript "^#\<\(quit\|labels\|warnings\|directory\|cd\|load\|use\|install_printer\|remove_printer\|require\|thread\|trace\|untrace\|untrace_all\|print_depth\|print_length\|camlp4o\)\>"
-
-" lowercase identifier - the standard way to match
-syn match    fstarLCIdentifier /\<\(\l\|_\)\(\w\|'\)*\>/
-
-syn match    fstarKeyChar    "|"
-
-" Errors
-syn match    fstarBraceErr   "}"
-syn match    fstarBrackErr   "\]"
-syn match    fstarParenErr   ")"
-syn match    fstarArrErr     "|]"
-
-syn match    fstarCommentErr "\*)"
-
-syn match    fstarCountErr   "\<downto\>"
-syn match    fstarCountErr   "\<to\>"
-
-if !exists("fstar_revised")
-  syn match    fstarDoErr      "\<do\>"
-endif
-
-syn match    fstarDoneErr    "\<done\>"
-syn match    fstarThenErr    "\<then\>"
-
-" Error-highlighting of "end" without synchronization:
-" as keyword or as error (default)
-if exists("fstar_noend_error")
-  syn match    fstarKeyword    "\<end\>"
-else
-  syn match    fstarEndErr     "\<end\>"
-endif
-
-" Some convenient clusters
-syn cluster  fstarAllErrs contains=fstarBraceErr,fstarBrackErr,fstarParenErr,fstarCommentErr,fstarCountErr,fstarDoErr,fstarDoneErr,fstarEndErr,fstarThenErr
-
-syn cluster  fstarAENoParen contains=fstarBraceErr,fstarBrackErr,fstarCommentErr,fstarCountErr,fstarDoErr,fstarDoneErr,fstarEndErr,fstarThenErr
-
-syn cluster  fstarContained contains=fstarTodo,fstarPreDef,fstarModParam,fstarModParam1,fstarPreMPRestr,fstarMPRestr,fstarMPRestr1,fstarMPRestr2,fstarMPRestr3,fstarModRHS,fstarFuncWith,fstarFuncStruct,fstarModTypeRestr,fstarModTRWith,fstarWith,fstarWithRest,fstarModType,fstarFullMod,fstarVal
+" Items that may only appear via nextgroup / inside specific regions.
+syn cluster  fstarContained contains=fstarTodo,fstarModule,fstarModuleAlias
 
 
-" Enclosing delimiters
-syn region   fstarEncl transparent matchgroup=fstarKeyword start="(" matchgroup=fstarKeyword end=")" contains=ALLBUT,@fstarContained,fstarParenErr
-syn region   fstarEncl transparent matchgroup=fstarKeyword start="{" matchgroup=fstarKeyword end="}"  contains=ALLBUT,@fstarContained,fstarBraceErr
-syn region   fstarEncl transparent matchgroup=fstarKeyword start="\[" matchgroup=fstarKeyword end="\]" contains=ALLBUT,@fstarContained,fstarBrackErr
-syn region   fstarEncl transparent matchgroup=fstarKeyword start="\[|" matchgroup=fstarKeyword end="|\]" contains=ALLBUT,@fstarContained,fstarArrErr
+" ---------------------------------------------------------------------------
+" Identifiers
+" Consuming identifiers as one item keeps the operator/number patterns below
+" from firing in the middle of a word (e.g. the "0" in "var_0").
+syn match    fstarLCIdentifier "\<\%(\l\|_\)\%(\w\|'\)*"
+" Type variables: 'a, 'b, ...
+syn match    fstarLCIdentifier "'\%(\l\|_\)\%(\w\|'\)*"
 
 
-" Comments
-syn region   fstarComment start="(\*" end="\*)" contains=@Spell,fstarComment,fstarTodo
-syn match    fstarCommentLine "//.*$" contains=fstarComment,fstarCommentLine,fstarTodo,@Spell
-syn keyword  fstarTodo contained TODO FIXME XXX NOTE
-
-
-" Objects
-syn region   fstarEnd matchgroup=fstarObject start="\<object\>" matchgroup=fstarObject end="\<end\>" contains=ALLBUT,@fstarContained,fstarEndErr
-
-
-" Blocks
-if !exists("fstar_revised")
-  syn region   fstarEnd matchgroup=fstarKeyword start="\<begin\>" matchgroup=fstarKeyword end="\<end\>" contains=ALLBUT,@fstarContained,fstarEndErr
-endif
-
-
-" "for"
-syn region   fstarNone matchgroup=fstarKeyword start="\<for\>" matchgroup=fstarKeyword end="\<\(to\|downto\)\>" contains=ALLBUT,@fstarContained,fstarCountErr
-
-
-" "do"
-if !exists("fstar_revised")
-  syn region   fstarDo matchgroup=fstarKeyword start="\<do\>" matchgroup=fstarKeyword end="\<done\>" contains=ALLBUT,@fstarContained,fstarDoneErr
-endif
-
-" "if"
-syn region   fstarNone matchgroup=fstarKeyword start="\<if\>" matchgroup=fstarKeyword end="\<then\>" contains=ALLBUT,@fstarContained,fstarThenErr
-
-
-"" Modules
-
-" "sig"
-syn region   fstarSig matchgroup=fstarModule start="\<sig\>" matchgroup=fstarModule end="\<end\>" contains=ALLBUT,@fstarContained,fstarEndErr,fstarModule
-syn region   fstarModSpec matchgroup=fstarKeyword start="\<module\>" matchgroup=fstarModule end="\<\u\(\w\|'\)*\>" contained contains=@fstarAllErrs,fstarComment,fstarCommentLine skipwhite skipempty nextgroup=fstarModTRWith,fstarMPRestr
-
-" "open"
-syn region   fstarNone matchgroup=fstarKeyword start="\<open\>" matchgroup=fstarModule end="\<\u\(\w\|'\)*\( *\. *\u\(\w\|'\)*\)*\>" contains=@fstarAllErrs,fstarComment,fstarCommentLine
-
-" "include"
-syn match    fstarKeyword "\<include\>" skipwhite skipempty nextgroup=fstarModParam,fstarFullMod
-
-" "module" - somewhat complicated stuff ;-)
-syn region   fstarModule matchgroup=fstarKeyword start="\<module\>" matchgroup=fstarModule end="\<\u\(\w\|\.\)*\>" contains=@fstarAllErrs,fstarComment,fstarCommentLine skipwhite skipempty nextgroup=fstarPreDef
-syn region   fstarPreDef start="[:print:]"me=e-1 matchgroup=fstarKeyword end="\l\|=\|)"me=e-1 contained contains=@fstarAllErrs,fstarComment,fstarCommentLine,fstarModParam,fstarModTypeRestr,fstarModTRWith nextgroup=fstarModPreRHS
-syn region   fstarModParam start="([^*]" end=")" contained contains=@fstarAENoParen,fstarModParam1,fstarVal
-syn match    fstarModParam1 "\<\u\(\w\|'\)*\>" contained skipwhite skipempty nextgroup=fstarPreMPRestr
-
-syn region   fstarPreMPRestr start="."me=e-1 end=")"me=e-1 contained contains=@fstarAllErrs,fstarComment,fstarCommentLine,fstarMPRestr,fstarModTypeRestr
-
-syn region   fstarMPRestr start=":" end="."me=e-1 contained contains=@fstarComment,fstarCommentLine skipwhite skipempty nextgroup=fstarMPRestr1,fstarMPRestr2,fstarMPRestr3
-syn region   fstarMPRestr1 matchgroup=fstarModule start="\ssig\s\=" matchgroup=fstarModule end="\<end\>" contained contains=ALLBUT,@fstarContained,fstarEndErr,fstarModule
-syn region   fstarMPRestr2 start="\sfunctor\(\s\|(\)\="me=e-1 matchgroup=fstarKeyword end="->" contained contains=@fstarAllErrs,fstarComment,fstarCommentLine,fstarModParam skipwhite skipempty nextgroup=fstarFuncWith,fstarMPRestr2
-syn match    fstarMPRestr3 "\w\(\w\|'\)*\( *\. *\w\(\w\|'\)*\)*" contained
-syn match    fstarModPreRHS "=" contained skipwhite skipempty nextgroup=fstarModParam,fstarFullMod
-syn keyword  fstarKeyword val
-syn region   fstarVal matchgroup=fstarKeyword start="\<val\>" matchgroup=fstarLCIdentifier end="\<\l\(\w\|'\)*\>" contains=@fstarAllErrs,fstarComment,fstarCommentLine,fstarFullMod skipwhite skipempty nextgroup=fstarMPRestr
-syn region   fstarModRHS start="." end=". *\w\|([^*]"me=e-2 contained contains=fstarComment,fstarCommentLine skipwhite skipempty nextgroup=fstarModParam,fstarFullMod
-syn match    fstarFullMod "\<\u\(\w\|'\)*\( *\. *\u\(\w\|'\)*\)*" contained skipwhite skipempty nextgroup=fstarFuncWith
-
-syn region   fstarFuncWith start="([^*]"me=e-1 end=")" contained contains=fstarComment,fstarCommentLine,fstarWith,fstarFuncStruct skipwhite skipempty nextgroup=fstarFuncWith
-syn region   fstarFuncStruct matchgroup=fstarModule start="[^a-zA-Z]struct\>"hs=s+1 matchgroup=fstarModule end="\<end\>" contains=ALLBUT,@fstarContained,fstarEndErr
-
-syn match    fstarModTypeRestr "\<\w\(\w\|'\)*\( *\. *\w\(\w\|'\)*\)*\>" contained
-syn region   fstarModTRWith start=":\s*("hs=s+1 end=")" contained contains=@fstarAENoParen,fstarWith
-syn match    fstarWith "\<\(\u\(\w\|'\)* *\. *\)*\w\(\w\|'\)*\>" contained skipwhite skipempty nextgroup=fstarWithRest
-syn region   fstarWithRest start="[^)]" end=")"me=e-1 contained contains=ALLBUT,@fstarContained
-
-" "struct"
-syn region   fstarStruct matchgroup=fstarModule start="\<\(module\s\+\)\=struct\>" matchgroup=fstarModule end="\<end\>" contains=ALLBUT,@fstarContained,fstarEndErr
-
-" "module type"
-syn region   fstarKeyword start="\<module\>\s*\<type\>\(\s*\<of\>\)\=" matchgroup=fstarModule end="\<\w\(\w\|'\)*\>" contains=fstarComment,fstarCommentLine skipwhite skipempty nextgroup=fstarMTDef
-syn match    fstarMTDef "=\s*\w\(\w\|'\)*\>"hs=s+1,me=s+1 skipwhite skipempty nextgroup=fstarFullMod
-
-syn keyword  fstarKeyword  and as assume assert
-syn keyword  fstarKeyword  constraint decreases else ensures
-syn keyword  fstarKeyword  exception external fun
-
-syn keyword  fstarKeyword  in inherit initializer
-syn keyword  fstarKeyword  land lazy let logic match
-syn keyword  fstarKeyword  method mutable new of opaque
-syn keyword  fstarKeyword  parser pattern private raise rec requires
-syn keyword  fstarKeyword  try type
-syn keyword  fstarKeyword  virtual when while with
-syn keyword  fstarKeyword  class instance
-syn keyword  fstarKeyword  unfold
-
-syn keyword  fstarBoolean  True False
-syn keyword  fstarKeyword  function
-syn keyword  fstarBoolean  true false
-syn match    fstarKeyChar  "!"
-
-syn keyword  fstarType     array bool char exn float format format4
-syn keyword  fstarType     nat int int32 int64 lazy_t list nativeint option
-syn keyword  fstarType     string unit
-syn keyword fstarType set map forall exists
-
-syn keyword  fstarOperator asr lnot lor lsl lsr lxor mod not
-
-syn match    fstarConstructor  "(\s*)"
-syn match    fstarConstructor  "\[\s*\]"
-syn match    fstarConstructor  "\[|\s*>|]"
-syn match    fstarConstructor  "\[<\s*>\]"
-syn match    fstarConstructor  "\u\(\w\|'\)*\>"
-
-" Polymorphic variants
-syn match    fstarConstructor  "`\w\(\w\|'\)*\>"
-
-" Module prefix
-syn match    fstarModPath      "\u\(\w\|'\)* *\."he=e-1
-
-syn match    fstarCharacter    "'\\\d\d\d'\|'\\[\'ntbr]'\|'.'"
-syn match    fstarCharacter    "'\\x\x\x'"
-syn match    fstarCharErr      "'\\\d\d'\|'\\\d'"
-syn match    fstarCharErr      "'\\[^\'ntbr]'"
-syn region   fstarString       start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
-
-syn match    fstarFunDef       "->"
-syn match    fstarRefAssign    ":="
-syn match    fstarTopStop      ";;"
-syn match    fstarOperator     "\^"
-syn match    fstarOperator     "::"
-syn match    fstarOperator     ":"
-
-syn match fstarOperator "\\/"
-syn match fstarOperator "/\\"
-syn match    fstarOperator     "&&"
-syn match    fstarOperator     "<"
-syn match    fstarOperator     ">"
-syn match fstarOperator "\<\>"
-syn match    fstarAnyVar       "\<_\>"
-syn match    fstarKeyChar      "|[^\]]"me=e-1
+" ---------------------------------------------------------------------------
+" Punctuation and operators
+" Single-character items first; multi-character items are defined afterwards
+" so that they take priority when both start at the same column.
+syn match    fstarKeyChar      "!"
 syn match    fstarKeyChar      ";"
 syn match    fstarKeyChar      "\~"
 syn match    fstarKeyChar      "?"
 syn match    fstarKeyChar      "\*"
 syn match    fstarKeyChar      "="
+" Implicit argument marker: #a, #1.0R
+syn match    fstarKeyChar      "#"
+" A bare "|" (not the tail of a |] |) |} closer).
+syn match    fstarKeyChar      "|\ze\%([^\]})]\|$\)"
+syn match    fstarAnyVar       "\<_\>"
 
-if exists("fstar_revised")
-  syn match    fstarErr        "<-"
+syn match    fstarOperator     "\^"
+syn match    fstarOperator     "@"
+syn match    fstarOperator     "<"
+syn match    fstarOperator     ">"
+syn match    fstarOperator     ":"
+syn match    fstarOperator     "::"
+syn match    fstarOperator     "&&"
+syn match    fstarOperator     "||"
+syn match    fstarOperator     "/\\"
+syn match    fstarOperator     "\\/"
+syn match    fstarOperator     "=="
+syn match    fstarOperator     "=!="
+syn match    fstarOperator     "<>"
+syn match    fstarOperator     "<:"
+syn match    fstarOperator     "<|"
+syn match    fstarOperator     "|>"
+syn match    fstarOperator     "<-"
+syn match    fstarOperator     "==>"
+syn match    fstarOperator     "<==>"
+" Pulse: separating conjunction and magic wand
+syn match    fstarOperator     "\*\*"
+syn match    fstarOperator     "@==>"
+" Unicode operators accepted by the F* lexer
+syn match    fstarOperator     "[∀∃∧∨¬≠≤≥→⟹⟸⇔∘]"
+syn match    fstarKeyword      "λ"
+
+syn match    fstarFunDef       "->"
+syn match    fstarRefAssign    ":="
+
+" Backtick infix application:  a `Int32.add` b
+syn match    fstarInfixOp      "`\%(\u\%(\w\|'\)*\.\)*\%(\l\|_\)\%(\w\|'\)*`"
+
+syn keyword  fstarOperator     not
+
+
+" ---------------------------------------------------------------------------
+" Errors: closing delimiters without a matching opener.  The fstarEncl regions
+" below consume properly matched closers, so only stray ones remain visible.
+syn match    fstarBraceErr     "|\=}"
+syn match    fstarBrackErr     "|\=\]"
+syn match    fstarParenErr     "|\=)"
+syn match    fstarCommentErr   "\*)"
+
+if exists("g:fstar_noend_error")
+  syn match  fstarKeyword      "\<end\>"
 else
-  syn match    fstarOperator   "<-"
+  syn match  fstarEndErr       "\<end\>"
 endif
 
-syn match    fstarNumber        "\<-\=\d\(_\|\d\)*[l|L|n]\?\>"
-syn match    fstarNumber        "\<-\=0[x|X]\(\x\|_\)\+[l|L|n]\?\>"
-syn match    fstarNumber        "\<-\=0[o|O]\(\o\|_\)\+[l|L|n]\?\>"
-syn match    fstarNumber        "\<-\=0[b|B]\([01]\|_\)\+[l|L|n]\?\>"
-syn match    fstarFloat         "\<-\=\d\(_\|\d\)*\.\?\(_\|\d\)*\([eE][-+]\=\d\(_\|\d\)*\)\=\>"
 
-" Labels
-syn match    fstarLabel        "\~\(\l\|_\)\(\w\|'\)*"lc=1
-syn match    fstarLabel        "?\(\l\|_\)\(\w\|'\)*"lc=1
-syn region   fstarLabel transparent matchgroup=fstarLabel start="?(\(\l\|_\)\(\w\|'\)*"lc=2 end=")"me=e-1 contains=ALLBUT,@fstarContained,fstarParenErr
+" ---------------------------------------------------------------------------
+" Enclosing delimiters
+" These regions nest freely, which is what makes Pulse's C-like
+" `if (..) { .. } else { .. }` blocks work: every "}" closes the innermost
+" "{" and nothing else may swallow it.
+syn region   fstarEncl transparent matchgroup=fstarKeyword start="("   matchgroup=fstarKeyword end=")"   contains=ALLBUT,@fstarContained,fstarParenErr
+syn region   fstarEncl transparent matchgroup=fstarKeyword start="(|"  matchgroup=fstarKeyword end="|)"  contains=ALLBUT,@fstarContained,fstarParenErr
+syn region   fstarEncl transparent matchgroup=fstarKeyword start="{"   matchgroup=fstarKeyword end="}"   contains=ALLBUT,@fstarContained,fstarBraceErr
+syn region   fstarEncl transparent matchgroup=fstarKeyword start="{|"  matchgroup=fstarKeyword end="|}"  contains=ALLBUT,@fstarContained,fstarBraceErr
+syn region   fstarEncl transparent matchgroup=fstarKeyword start="\["  matchgroup=fstarKeyword end="\]"  contains=ALLBUT,@fstarContained,fstarBrackErr
+syn region   fstarEncl transparent matchgroup=fstarKeyword start="\[|" matchgroup=fstarKeyword end="|\]" contains=ALLBUT,@fstarContained,fstarBrackErr
+
+" begin ... end
+syn region   fstarEnd matchgroup=fstarKeyword start="\<begin\>" matchgroup=fstarKeyword end="\<end\>" contains=ALLBUT,@fstarContained,fstarEndErr
 
 
+" ---------------------------------------------------------------------------
+" Keywords
+
+" F* keywords (FStarC.Parser.LexFStar).  Note that "if" and "then" are plain
+" keywords: an `if` region ending at `then` would never terminate in Pulse,
+" whose conditionals are `if c { .. } else { .. }`.
+syn keyword  fstarKeyword  and as assert attributes by calc class decreases
+syn keyword  fstarKeyword  effect eliminate else ensures exception exists
+syn keyword  fstarKeyword  forall fun function if in inline
+syn keyword  fstarKeyword  inline_for_extraction instance introduce irreducible
+syn keyword  fstarKeyword  layered_effect let logic match new new_effect noeq
+syn keyword  fstarKeyword  noextract of opaque polymonadic_bind
+syn keyword  fstarKeyword  polymonadic_subcomp private quote range_of rec
+syn keyword  fstarKeyword  reifiable reflectable reify requires returns
+syn keyword  fstarKeyword  set_range_of sub_effect synth then total try type
+syn keyword  fstarKeyword  unfold unfoldable unopteq val when with
+
+" module M / open M.N / include M / friend M / module A = B.C
+syn keyword  fstarKeyword  nextgroup=fstarModule skipwhite module open include friend
+syn match    fstarModule       "\u\%(\w\|'\)*\%(\.\u\%(\w\|'\)*\)*" contained skipwhite nextgroup=fstarModuleAlias
+syn match    fstarModuleAlias  "=" contained skipwhite nextgroup=fstarModule
+
+" Pulse keywords (PulseSyntaxExtension.Parser), plus the older `parallel` and
+" `with_invariants` forms.
+syn keyword  fstarPulseKeyword fn mut while invariant predicate divergent each
+syn keyword  fstarPulseKeyword rewrite norewrite fold atomic ghost unobservable
+syn keyword  fstarPulseKeyword opens show_proof_state preserves
+syn keyword  fstarPulseKeyword goto label return continue break defer
+syn keyword  fstarPulseKeyword parallel with_invariants
+
+" Escape hatches: the proof is not complete while these are present.
+syn keyword  fstarEscapeHatch  admit assume magic unsafe_coerce
+
+syn keyword  fstarBoolean  true false True False
+
+syn keyword  fstarType     unit bool int nat pos string char list option exn
+syn keyword  fstarType     array ref erased
+syn keyword  fstarType     int8 int16 int32 int64 uint8 uint16 uint32 uint64
+syn keyword  fstarType     Type Type0 eqtype prop Tot GTot Lemma
+syn keyword  fstarType     slprop
+
+
+" ---------------------------------------------------------------------------
+" Constructors and module paths
+syn match    fstarConstructor  "(\s*)"
+syn match    fstarConstructor  "\[\s*\]"
+syn match    fstarConstructor  "\<\u\%(\w\|'\)*"
+syn match    fstarModPath      "\<\u\%(\w\|'\)* *\."he=e-1
+
+
+" ---------------------------------------------------------------------------
+" Literals
+
+" Integers with the F* machine-integer suffixes: 1y 2uy 3s 4us 5l 6ul 7L 8uL 9sz 10z
+syn match    fstarNumber       "\<\d\+\%([uU]\=[yslL]\|sz\|z\)\=\>"
+syn match    fstarNumber       "\<0[xX]\x\+\%([uU]\=[yslL]\|sz\|z\|LF\)\=\>"
+syn match    fstarNumber       "\<0[oO]\o\+\%([uU]\=[yslL]\|sz\|z\)\=\>"
+syn match    fstarNumber       "\<0[bB][01]\+\%([uU]\=[yslL]\|sz\|z\)\=\>"
+" Floats and reals (1.5, 1e10, 2.0R)
+syn match    fstarFloat        "\<\d\+\.\d*\%([eE][-+]\=\d\+\)\=R\=\>"
+syn match    fstarFloat        "\<\d\+[eE][-+]\=\d\+\>"
+
+" Characters: 'a', '\n', '\x41', 'λ'
+syn match    fstarCharacter    +'[^\\']'+
+syn match    fstarCharacter    +'\\\%([\\"'bfntrv0]\|x\x\x\|u\x\x\x\x\)'+
+
+syn region   fstarString       start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
+
+
+" ---------------------------------------------------------------------------
+" Pragmas and language selectors:  #lang-pulse, #push-options "...", ...
+syn match    fstarPragma       "^\s*#\%(lang-\w\+\|set-options\|reset-options\|push-options\|pop-options\|show-options\|restart-solver\|print-effects-graph\|check\|eval\)\>"
+" Older embedded-DSL fences: ```pulse ... ```
+syn match    fstarPragma       "^\s*```\w*\s*$"
+syn match    fstarPragma       "%splice\%(_t\)\=\>"
+
+
+" ---------------------------------------------------------------------------
+" Comments (defined last so that "(*" wins over the "(" region).
+syn region   fstarComment      start="(\*" end="\*)" contains=@Spell,fstarComment,fstarTodo
+syn match    fstarCommentLine  "//.*$" contains=fstarTodo,@Spell
+syn keyword  fstarTodo         contained TODO FIXME XXX NOTE
+
+
+" ---------------------------------------------------------------------------
 " Synchronization
+" Brace blocks in Pulse (and long definitions in F*) can span hundreds of
+" lines, so "start N lines back with an empty state" is not good enough.
+" Instead, like python.vim, look back for a top-level declaration keyword in
+" column 0 -- that is a point where no delimiter regions are open -- and
+" parse forward from there.
 syn sync minlines=50
-syn sync maxlines=500
+syn sync match fstarDeclSync grouphere NONE "^\%(let\|and\|val\|type\|module\|open\|include\|friend\|effect\|new_effect\|layered_effect\|sub_effect\|polymonadic_bind\|polymonadic_subcomp\|class\|instance\|exception\|assume\|noeq\|unopteq\|irreducible\|inline_for_extraction\|noextract\|private\|unfold\|fn\|ghost\|atomic\|unobservable\|divergent\)\>"
+syn sync match fstarPragmaSync grouphere NONE "^#\%(push-options\|pop-options\|set-options\|reset-options\|show-options\|restart-solver\|lang-\)"
+syn sync match fstarCommentSync grouphere fstarComment "^(\*"
 
-if !exists("fstar_revised")
-  syn sync match fstarDoSync      grouphere  fstarDo      "\<do\>"
-  syn sync match fstarDoSync      groupthere fstarDo      "\<done\>"
-endif
 
-if exists("fstar_revised")
-  syn sync match fstarEndSync     grouphere  fstarEnd     "\<\(object\)\>"
-else
-  syn sync match fstarEndSync     grouphere  fstarEnd     "\<\(begin\|object\)\>"
-endif
+" ---------------------------------------------------------------------------
+" Default highlighting
+hi def link fstarBraceErr      Error
+hi def link fstarBrackErr      Error
+hi def link fstarParenErr      Error
+hi def link fstarCommentErr    Error
+hi def link fstarEndErr        Error
 
-syn sync match fstarEndSync     groupthere fstarEnd     "\<end\>"
-syn sync match fstarStructSync  grouphere  fstarStruct  "\<struct\>"
-syn sync match fstarStructSync  groupthere fstarStruct  "\<end\>"
-syn sync match fstarSigSync     grouphere  fstarSig     "\<sig\>"
-syn sync match fstarSigSync     groupthere fstarSig     "\<end\>"
+hi def link fstarComment       Comment
+hi def link fstarCommentLine   Comment
+hi def link fstarTodo          Todo
 
-" Define the default highlighting.
-" For version 5.7 and earlier: only when not done already
-" For version 5.8 and later: only when an item doesn't have highlighting yet
-if version >= 508 || !exists("did_fstar_syntax_inits")
-  if version < 508
-    let did_fstar_syntax_inits = 1
-    command -nargs=+ HiLink hi link <args>
-  else
-    command -nargs=+ HiLink hi def link <args>
-  endif
+hi def link fstarModPath       Include
+hi def link fstarModule        Include
+hi def link fstarPragma        PreProc
 
-  HiLink fstarBraceErr	   Error
-  HiLink fstarBrackErr	   Error
-  HiLink fstarParenErr	   Error
-  HiLink fstarArrErr	   Error
+hi def link fstarConstructor   Constant
 
-  HiLink fstarCommentErr   Error
+hi def link fstarKeyword       Keyword
+hi def link fstarPulseKeyword  Keyword
+hi def link fstarFunDef        Keyword
+hi def link fstarRefAssign     Keyword
+hi def link fstarKeyChar       Keyword
+hi def link fstarAnyVar        Keyword
+hi def link fstarOperator      Keyword
+hi def link fstarInfixOp       Keyword
+hi def link fstarModuleAlias   Keyword
+hi def link fstarEncl          Keyword
 
-  HiLink fstarCountErr	   Error
-  HiLink fstarDoErr	   Error
-  HiLink fstarDoneErr	   Error
-  HiLink fstarEndErr	   Error
-  HiLink fstarThenErr	   Error
+hi def link fstarEscapeHatch   Todo
 
-  HiLink fstarCharErr	   Error
-
-  HiLink fstarErr	   Error
-
-  HiLink fstarComment	   Comment
-  HiLink fstarCommentLine	   Comment
-
-  HiLink fstarModPath	   Include
-  HiLink fstarObject	   Include
-  HiLink fstarModule	   Include
-  HiLink fstarModParam1    Include
-  HiLink fstarModType	   Include
-  HiLink fstarMPRestr3	   Include
-  HiLink fstarFullMod	   Include
-  HiLink fstarModTypeRestr Include
-  HiLink fstarWith	   Include
-  HiLink fstarMTDef	   Include
-
-  HiLink fstarScript	   Include
-
-  HiLink fstarConstructor  Constant
-
-  HiLink fstarVal          Keyword
-  HiLink fstarModPreRHS    Keyword
-  HiLink fstarMPRestr2	   Keyword
-  HiLink fstarKeyword	   Keyword
-  HiLink fstarMethod	   Include
-  HiLink fstarFunDef	   Keyword
-  HiLink fstarRefAssign    Keyword
-  HiLink fstarKeyChar	   Keyword
-  HiLink fstarAnyVar	   Keyword
-  HiLink fstarTopStop	   Keyword
-  HiLink fstarOperator	   Keyword
-
-  HiLink fstarBoolean	   Boolean
-  HiLink fstarCharacter    Character
-  HiLink fstarNumber	   Number
-  HiLink fstarFloat	   Float
-  HiLink fstarString	   String
-
-  HiLink fstarLabel	   Identifier
-
-  HiLink fstarType	   Type
-
-  HiLink fstarTodo	   Todo
-
-  HiLink fstarEncl	   Keyword
-
-  delcommand HiLink
-endif
+hi def link fstarBoolean       Boolean
+hi def link fstarCharacter     Character
+hi def link fstarNumber        Number
+hi def link fstarFloat         Float
+hi def link fstarString        String
+hi def link fstarType          Type
 
 let b:current_syntax = "fstar"
 

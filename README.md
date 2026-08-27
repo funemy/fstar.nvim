@@ -6,7 +6,7 @@ This is an actively maintained fork of [VimFStar]
 
 ## Features
 
-- Syntax highlighting
+- Syntax highlighting for F* and Pulse
 - Language server support
 - Interactive verification of code
 
