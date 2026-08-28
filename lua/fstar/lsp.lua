@@ -70,13 +70,13 @@ function lsp.restart(bufnr)
 	bufnr = bufnr or 0
 	local client = lsp.get_fstar_server(bufnr)
 	local uri = vim.uri_from_bufnr(bufnr)
-	client.notify("$/fstar/restart", { uri = uri })
+	client:notify("$/fstar/restart", { uri = uri })
 end
 
 function lsp.killAll(bufnr)
 	bufnr = bufnr or 0
 	local client = lsp.get_fstar_server(bufnr)
-	client.notify("$/fstar/killAll", {})
+	client:notify("$/fstar/killAll", {})
 end
 
 ---Restart the Z3 process for an open F* file.
@@ -85,15 +85,13 @@ function lsp.restart_solver(bufnr)
 	bufnr = bufnr or 0
 	local client = lsp.get_fstar_server(bufnr)
 	local uri = vim.uri_from_bufnr(bufnr)
-	client.notify("$/fstar/killAndRestartSolver", { uri = uri })
+	client:notify("$/fstar/killAndRestartSolver", { uri = uri })
 end
 
 ---@class lsp.Position
----@field line integer
----@field character integer
 
 ---@return lsp.Position
-function lsp.get_cur_pos(bufnr)
+function lsp.get_cur_pos(_bufnr)
 	local row, col = unpack(vim.api.nvim_win_get_cursor(0))
 	return { line = row - 1, character = col }
 end
@@ -113,7 +111,7 @@ function lsp.verify_to_position(bufnr, pos, lax)
 	bufnr = bufnr or 0
 	local client = lsp.get_fstar_server(bufnr)
 	local uri = vim.uri_from_bufnr(bufnr)
-	client.notify("$/fstar/verifyToPosition", {
+	client:notify("$/fstar/verifyToPosition", {
 		uri = uri,
 		position = pos,
 		lax = lax,
