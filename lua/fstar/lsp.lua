@@ -29,8 +29,8 @@ function lsp.enable(opts)
 				if opts.auto_download ~= false then
 					lsp.download_lsp_server()
 				end
-				local root = require("lspconfig.util").find_git_ancestor(startpath) or vim.fs.dirname(startpath)
-				return root
+				local git_dir = vim.fs.find(".git", { path = startpath, upward = true })[1]
+				return git_dir and vim.fs.dirname(git_dir) or vim.fs.dirname(startpath)
 			end,
 			settings = {
 				fstarVSCodeAssistant = {
